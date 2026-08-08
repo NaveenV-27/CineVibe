@@ -1,12 +1,60 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Star, Film, Trash2, Calendar } from "lucide-react";
+import { Star, Film, Trash2, Calendar, Heart } from "lucide-react";
+import { useUser } from "@clerk/clerk-react";
 
 export default function MovieCard({ movie, showRemove = false, onRemove }) {
+  const { user } = useUser();
+  const [isSaved, setIsSaved] = useState(false);
+
   const rating = movie.vote_average ? movie.vote_average.toFixed(1) : "N/A";
+
+  // Check if movie is already in user's wishlist
+  useEffect(() => {
+    if (!user) return;
+    const stored = JSON.parse(localStorage.getItem(`wishlist_${user.id}`)) || [];
+    setIsSaved(stored.some((m) => m.id === movie.id));
+  }, [user, movie.id]);
+
+  // Toggle wishlist item from card top-right heart
+  const handleWishlistToggle = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) return;
+
+    const stored = JSON.parse(localStorage.getItem(`wishlist_${user.id}`)) || [];
+
+    if (isSaved) {
+      const updated = stored.filter((m) => m.id !== movie.id);
+      localStorage.setItem(`wishlist_${user.id}`, JSON.stringify(updated));
+      setIsSaved(false);
+      if (onRemove) onRemove(movie.id);
+    } else {
+      const updated = [...stored, movie];
+      localStorage.setItem(`wishlist_${user.id}`, JSON.stringify(updated));
+      setIsSaved(true);
+    }
+  };
 
   return (
     <div className="relative group bg-[#0F121C]/90 border border-slate-800 rounded-xl p-2.5 transition-all duration-300 hover:border-[#00F0FF]/60 hover:shadow-[0_0_20px_rgba(0,240,255,0.25)] hover:-translate-y-1.5 flex flex-col justify-between">
       
+      {/* Top-Right Quick Wishlist Heart Button */}
+      {user && !showRemove && (
+        <button
+          onClick={handleWishlistToggle}
+          aria-label="Wishlist movie"
+          className={`absolute top-4 right-4 z-20 p-2 rounded-lg backdrop-blur-md border transition-all duration-300 active:scale-90 ${
+            isSaved
+              ? "bg-[#FF007F]/20 border-[#FF007F] text-[#FF007F] shadow-[0_0_12px_rgba(255,0,127,0.5)]"
+              : "bg-black/60 border-slate-700/80 text-slate-400 hover:text-white hover:border-[#00F0FF]"
+          }`}
+        >
+          <Heart className={`w-4 h-4 ${isSaved ? "fill-[#FF007F]" : ""}`} />
+        </button>
+      )}
+
       <Link to={`/movies/${movie.id}`} className="block relative overflow-hidden rounded-lg group">
         
         {/* Rating Badge */}
@@ -49,7 +97,7 @@ export default function MovieCard({ movie, showRemove = false, onRemove }) {
 
       </Link>
 
-      {/* Remove Button for Wishlist */}
+      {/* Remove Button for Profile Wishlist View */}
       {showRemove && (
         <button
           onClick={(e) => {
