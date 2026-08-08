@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   SignedIn,
   SignedOut,
@@ -8,125 +8,161 @@ import {
   UserButton,
   useUser,
 } from "@clerk/clerk-react";
-
-const DotIcon = () => {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" height="17px" viewBox="0 -960 960 960" width="17px" fill="#B7B7B7"><path d="M237-285q54-38 115.5-56.5T480-360q66 0 127.5 18.5T723-285q35-41 52-91t17-104q0-130-91-221t-221-91q-130 0-221 91t-91 221q0 54 17 104t52 91Zm141-165q-42-42-42-102t42-102q42-42 102-42t102 42q42 42 42 102t-42 102q-42 42-102 42t-102-42ZM480-96q-79 0-149-30t-122.5-82.5Q156-261 126-331T96-480q0-80 30-149.5t82.5-122Q261-804 331-834t149-30q80 0 149.5 30t122 82.5Q804-699 834-629.5T864-480q0 79-30 149t-82.5 122.5Q699-156 629.5-126T480-96Z"/></svg>
-  )
-}
+import { Film, User, Menu, X, LogIn, UserPlus, Compass, Home } from "lucide-react";
 
 export default function Navbar() {
   const [openNav, setOpenNav] = useState(false);
   const { user } = useUser();
-  
+  const location = useLocation();
+
+  const isActive = (path) => location.pathname === path;
+
   return (
-    <nav className="block mx-auto bg-slate-800/50 text-slate-200 px-6 py-3 sticky top-4 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg w-[95%] max-w-6xl z-9999">
+    <nav className="sticky top-4 mx-auto w-[95%] max-w-6xl z-50 bg-[#0F121C]/80 backdrop-blur-md border border-[#00F0FF]/30 px-6 py-3.5 rounded-2xl glow-cyan transition-all">
       <div className="flex items-center justify-between">
-        <Link to="/" className="text-xl font-bold hover:text-slate-300">
-          MovIEDC
+        
+        {/* Brand Logo */}
+        <Link 
+          to="/" 
+          className="flex items-center gap-2 font-orbitron text-xl font-black uppercase tracking-wider text-white hover:text-[#00F0FF] transition-colors"
+        >
+          <Film className="w-6 h-6 text-[#00F0FF] animate-pulse" />
+          <span>Cine<span className="text-[#00F0FF]">Vibe</span></span>
         </Link>
 
+        {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center gap-8">
-          <Link to="/" className="hover:text-slate-300">
-            Home
-          </Link>
-          <Link to="/movies" className="hover:text-slate-300">
-            Movies
-          </Link>
-
-          <div className="flex items-center gap-4">
-            <SignedIn>
-              <div className="text-sm font-mono">Hi! {user?.firstName}</div>
-              <UserButton>
-                <UserButton.MenuItems>
-                  <UserButton.Link 
-                    label="Profile"
-                    labelIcon={<DotIcon />}
-                    href="/profile"
-                    />
-                </UserButton.MenuItems>
-              </UserButton>
-            </SignedIn>
-
-            <SignedOut>
-              <SignInButton>
-                <button className="py-2 px-4 rounded-2xl bg-blue-100 text-gray-950 hover:bg-blue-200 hover:text-gray-900 transition">
-                  Sign In
-                </button>
-              </SignInButton>
-
-              <SignUpButton>
-                <button className="py-2 px-4 rounded-2xl bg-blue-600 text-gray-50 hover:bg-blue-800 hover:text-gray-200 transition">
-                  Sign Up
-                </button>
-              </SignUpButton>
-            </SignedOut>
-          </div>
-        </div>
-
-        <button
-          onClick={() => setOpenNav(!openNav)}
-          className="lg:hidden relative h-6 w-6 text-inherit"
-          type="button"
-        >
-          <span className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
+          <div className="flex items-center gap-6 font-orbitron text-xs font-semibold uppercase tracking-wider">
+            <Link 
+              to="/" 
+              className={`flex items-center gap-1.5 transition-colors ${
+                isActive("/") ? "text-[#00F0FF]" : "text-slate-400 hover:text-slate-200"
+              }`}
             >
-              {openNav ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
-          </span>
-        </button>
-      </div>
+              <Home className="w-4 h-4" />
+              <span>Home</span>
+            </Link>
 
-      {openNav && (
-        <div className="lg:hidden mt-4 flex flex-col gap-4">
-          <Link to="/">Home</Link>
-          <Link to="/movies">Movies</Link>
+            <Link 
+              to="/movies" 
+              className={`flex items-center gap-1.5 transition-colors ${
+                isActive("/movies") ? "text-[#00F0FF]" : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              <Compass className="w-4 h-4" />
+              <span>Movies</span>
+            </Link>
+          </div>
 
-          <div className="flex flex-col gap-3 mt-2">
+          {/* User Status / Auth Controls */}
+          <div className="flex items-center gap-4 border-l border-slate-800 pl-6">
             <SignedIn>
-              <div className="flex items-center justify-between text-sm font-mono">
-                Hi! {user?.firstName}
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-mono font-medium text-slate-300 bg-[#141824] px-3 py-1 rounded-md border border-slate-700/60">
+                  AGENT // <span className="text-[#00F0FF] font-bold">{user?.firstName}</span>
+                </span>
+
                 <UserButton>
                   <UserButton.MenuItems>
                     <UserButton.Link 
-                      label="Profile"
-                      labelIcon={<DotIcon />}
+                      label="Profile & Wishlist"
+                      labelIcon={<User className="w-4 h-4 text-[#00F0FF]" />}
                       href="/profile"
-                      />
+                    />
                   </UserButton.MenuItems>
                 </UserButton>
               </div>
             </SignedIn>
 
             <SignedOut>
-              <SignInButton>
-                <button className="py-3 px-4 rounded-2xl bg-blue-100 text-gray-950 hover:bg-blue-300 hover:text-gray-900 transition">
-                  Sign In
-                </button>
-              </SignInButton>
-              <SignUpButton>
-                <button className="py-3 px-4 rounded-2xl bg-blue-600 text-gray-50 hover:bg-blue-800 hover:text-gray-200 transition">
-                  Sign Up
-                </button>
-              </SignUpButton>
+              <div className="flex items-center gap-3 font-orbitron text-xs font-bold uppercase tracking-wider">
+                <SignInButton>
+                  <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#141824] hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-[#00F0FF]/40 transition-all active:scale-95">
+                    <LogIn className="w-3.5 h-3.5 text-[#00F0FF]" />
+                    <span>Sign In</span>
+                  </button>
+                </SignInButton>
+
+                <SignUpButton>
+                  <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#00F0FF] hover:bg-[#00D0DF] text-black transition-all shadow-[0_0_12px_rgba(0,240,255,0.3)] active:scale-95">
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>Sign Up</span>
+                  </button>
+                </SignUpButton>
+              </div>
+            </SignedOut>
+          </div>
+        </div>
+
+        {/* Mobile Hamburger Menu Toggle */}
+        <button
+          onClick={() => setOpenNav(!openNav)}
+          className="lg:hidden p-2 text-slate-300 hover:text-[#00F0FF] bg-[#141824] border border-slate-700/80 rounded-lg transition"
+          type="button"
+          aria-label="Toggle menu"
+        >
+          {openNav ? <X className="w-5 h-5 text-[#FF2E63]" /> : <Menu className="w-5 h-5" />}
+        </button>
+      </div>
+
+      {/* Mobile Drawer Menu */}
+      {openNav && (
+        <div className="lg:hidden mt-4 pt-4 border-t border-slate-800/80 flex flex-col gap-4 font-orbitron text-xs uppercase tracking-wider">
+          <Link 
+            to="/" 
+            onClick={() => setOpenNav(false)}
+            className={`flex items-center gap-2 p-2.5 rounded-lg ${
+              isActive("/") ? "bg-[#00F0FF]/10 text-[#00F0FF] border border-[#00F0FF]/30" : "text-slate-300"
+            }`}
+          >
+            <Home className="w-4 h-4" />
+            <span>Home</span>
+          </Link>
+
+          <Link 
+            to="/movies" 
+            onClick={() => setOpenNav(false)}
+            className={`flex items-center gap-2 p-2.5 rounded-lg ${
+              isActive("/movies") ? "bg-[#00F0FF]/10 text-[#00F0FF] border border-[#00F0FF]/30" : "text-slate-300"
+            }`}
+          >
+            <Compass className="w-4 h-4" />
+            <span>Movies</span>
+          </Link>
+
+          <div className="pt-2 border-t border-slate-800/80">
+            <SignedIn>
+              <div className="flex items-center justify-between p-2.5 bg-[#141824] border border-slate-700/80 rounded-lg">
+                <span className="font-mono text-xs text-slate-300">
+                  AGENT // <span className="text-[#00F0FF] font-bold">{user?.firstName}</span>
+                </span>
+                <UserButton>
+                  <UserButton.MenuItems>
+                    <UserButton.Link 
+                      label="Profile & Wishlist"
+                      labelIcon={<User className="w-4 h-4 text-[#00F0FF]" />}
+                      href="/profile"
+                    />
+                  </UserButton.MenuItems>
+                </UserButton>
+              </div>
+            </SignedIn>
+
+            <SignedOut>
+              <div className="flex flex-col gap-2.5 pt-2">
+                <SignInButton>
+                  <button className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#141824] text-slate-200 border border-slate-700 font-bold">
+                    <LogIn className="w-4 h-4 text-[#00F0FF]" />
+                    <span>Sign In</span>
+                  </button>
+                </SignInButton>
+                <SignUpButton>
+                  <button className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#00F0FF] text-black font-bold">
+                    <UserPlus className="w-4 h-4" />
+                    <span>Sign Up</span>
+                  </button>
+                </SignUpButton>
+              </div>
             </SignedOut>
           </div>
         </div>
