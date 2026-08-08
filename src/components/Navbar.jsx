@@ -26,7 +26,8 @@ export default function Navbar() {
           to="/" 
           className="flex items-center gap-2 font-orbitron text-xl font-black uppercase tracking-wider text-white hover:text-[#00F0FF] transition-colors"
         >
-          <Film className="w-6 h-6 text-[#00F0FF] animate-pulse" />
+          {/* <Film className="w-6 h-6 text-[#00F0FF] animate-pulse" /> */}
+          <img src="/favicon.svg" alt="CineVibe Logo" className="w-6 h-6 animate-pulse" />
           <span>Cine<span className="text-[#00F0FF]">Vibe</span></span>
         </Link>
 
